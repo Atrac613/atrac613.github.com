@@ -8,6 +8,7 @@ $(document).ready(function(){
 		user_list: [],
 		user_pos: [],
 		timer: null,
+		reset_flag: false,
 		lastTime: 0,
 		fps: 0,
 		init: function(){
@@ -21,7 +22,7 @@ $(document).ready(function(){
 	        this.context.globalCompositeOperation = "lighter";
 	        this.context.lineWidth = 0.2;
 	        this.context.font = "16px 'MS PGothic'";
-	        //this.canvas.onmousedown = this.reset;
+	        //this.canvas.onmousedown = that.reset(that);
 	        
 	        window.requestAnimFrame = (function(){
 	            return  window.requestAnimationFrame       || 
@@ -49,6 +50,13 @@ $(document).ready(function(){
 	                that.user_pos[key] = {x: e.pageX - (Math.random() * 5 * 100) + 250, y: e.pageY - (Math.random() * 5 * 100) + 250};
 	            }
 	        });
+	        
+	        $(document).click(function(e){
+	        	that.reset(that);
+	        });
+	        
+	        $('#message').append('<p>Click to reset.</p>').css('position','absolute').css('top', '50%').css('left', '50%').css('margin-left', '-40px').hide();
+	        $('#message').delay('2000').fadeIn('fast').delay('3000').fadeOut('slow');
 		},
 		addParticle: function(name){
 			var i = this.max_line;
@@ -60,9 +68,6 @@ $(document).ready(function(){
 	            var p = this.createParticle(i);
 	            this.user_list[name].push(p);
 	        }
-		},
-		reset: function(){
-			this.context.clearRect(0,0,this.width,this.height);
 		},
 		createParticle: function(id){
 			var p = new Object();
@@ -100,7 +105,21 @@ $(document).ready(function(){
 		getUserList: function(){
 			return this.user_list;
 		},
+		setResetFlag: function(flag){
+			this.reset_flag = flag;
+		},
+		getResetFlag: function(){
+			return this.reset_flag;
+		},
+		reset: function(that){
+			that.setResetFlag(true);
+		},
 		render: function(that){
+			if (this.getResetFlag()) {
+				this.context.clearRect(0, 0, this.width, this.height);
+				this.setResetFlag(false);
+			}
+			
 			var currentTime = new Date().getTime();
 			var dt = (currentTime - this.lastTime) / 1000;
 			this.lastTime = currentTime;
